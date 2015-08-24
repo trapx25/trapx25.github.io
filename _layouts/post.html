@@ -20,10 +20,10 @@ layout: default
 
   <div class="row top-buffer">
     <div class="col-lg-8 col-md-10 col-lg-offset-2 col-md-offset-1 share">
-      <a class="fa-links" href="https://twitter.com/share?text={{ page.title | replace: ' ', '+' }}&amp;url={{ page.url | prepend: site.url }}" onclick="window.open(this.href, 'Share on Twitter', 'width=500,height=255'); return false;">
+      <a class="fa-links" href="https://twitter.com/share?text={{ page.title | replace: ' ', '+' }}&amp;url={{ page.url | replace: '.html', '' | prepend: site.url }}" onclick="window.open(this.href, 'Share on Twitter', 'width=500,height=255'); return false;">
         <i class="fa fa-twitter fa-2x"></i>
       </a>
-      <a class="fa-links" href="//www.facebook.com/sharer.php?t={{ page.title | replace: ' ', '+' }}&amp;u={{ page.url | prepend: site.url }}" onclick="window.open(this.href, 'Share on Facebook', 'width=500,height=255'); return false;">
+      <a class="fa-links" href="//www.facebook.com/sharer.php?t={{ page.title | replace: ' ', '+' }}&amp;u={{ page.url | replace: '.html', '' | prepend: site.url }}" onclick="window.open(this.href, 'Share on Facebook', 'width=500,height=255'); return false;">
         <i class="fa fa-facebook fa-2x"></i>
       </a>
     </div>
