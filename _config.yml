@@ -1,0 +1,17 @@
+# Site settings
+title: Ryan Bishop
+email: rt.bishop@outlook.com
+url: "http://localhost:4000"
+twitter_username: trapx25
+github_username:  trapx25
+
+# Blog post tag settings
+tag_dir: /blog/tags
+
+# Build settings
+markdown: kramdown
+
+# Sass settings
+sass:
+  sass_dir: _partials # better naming convention
+  style: :compressed

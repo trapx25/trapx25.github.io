@@ -1,0 +1,7 @@
+@mixin transition($speed) {
+  -webkit-transition: all ease-in-out $speed;
+     -moz-transition: all ease-in-out $speed;
+      -ms-transition: all ease-in-out $speed;
+       -o-transition: all ease-in-out $speed;
+          transition: all ease-in-out $speed;
+}

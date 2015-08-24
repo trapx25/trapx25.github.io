@@ -1,0 +1,59 @@
+---
+layout: default
+---
+
+<div class="container">
+  <div class="row top-buffer">
+    <div class="col-lg-8 col-md-10 col-lg-offset-2 col-md-offset-1">
+      <h1>{{ page.title }}</h1>
+
+      <p id="date">
+        <i class="fa fa-clock-o"></i> {{ page.date | date: "%b %-d, %Y" }}, <i class="fa fa-tags"></i> Tags:
+          {% for tag in page.tags %}
+            <a href="{{ site.tag_dir }}/{{ tag }}/index.html">{{ tag }}</a>{% unless tag == page.tags.last %},{% endunless %}
+          {% endfor %}
+      </p>
+
+      <p>{{ content }}</p>
+    </div>
+  </div>
+
+  <div class="row top-buffer">
+    <div class="col-lg-8 col-md-10 col-lg-offset-2 col-md-offset-1 share">
+      <a class="fa-links" href="https://twitter.com/share?text={{ page.title | replace: ' ', '+' }}&amp;url={{ page.url | prepend: site.url }}" onclick="window.open(this.href, 'Share on Twitter', 'width=500,height=255'); return false;">
+        <i class="fa fa-twitter fa-2x"></i>
+      </a>
+      <a class="fa-links" href="//www.facebook.com/sharer.php?t={{ page.title | replace: ' ', '+' }}&amp;u={{ page.url | prepend: site.url }}" onclick="window.open(this.href, 'Share on Facebook', 'width=500,height=255'); return false;">
+        <i class="fa fa-facebook fa-2x"></i>
+      </a>
+    </div>
+  </div>
+
+  {% if page.comments %}
+    <div class="row top-buffer">
+      <div class="col-lg-8 col-md-10 col-lg-offset-2 col-md-offset-1">
+        <hr />
+      </div>
+    </div>
+    
+    <div class="row top-buffer">
+      <div class="col-lg-8 col-md-10 col-lg-offset-2 col-md-offset-1">
+        <div id="disqus_thread"></div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% if page.comments %}
+  <script>
+    var disqus_shortname = 'channel-ryanbishopsblog';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>
+    <p>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></p>
+  </noscript>
+{% endif %}

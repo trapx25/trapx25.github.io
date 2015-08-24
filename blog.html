@@ -1,0 +1,21 @@
+---
+layout: page
+title: Blog
+permalink: /blog/
+---
+
+{% for post in site.posts %}
+
+  <h1>
+    <a href="{{ post.url }}">{{ post.title }}</a>
+  </h1>
+
+  <p>{% if post.custom_excerpt %}{{ post.custom_excerpt }}{% else %}{{ post.excerpt }}{% endif %}</p>
+
+  <p id="date">
+    <i class="fa fa-clock-o"></i> {{ post.date | date: "%B %-d, %Y" }}
+  </p>
+
+  {% if post.previous %}<hr />{% endif %}
+
+{% endfor %}

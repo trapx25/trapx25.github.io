@@ -1,0 +1,48 @@
+a:link, a:hover, a:active, a:visited {
+  text-decoration: none;
+}
+
+a:link, a:active, a:visited {
+  color: $link-color;
+  border-bottom: 1px solid transparent;
+  @include transition(.3s);
+}
+
+a:hover {
+  color: $link-hover-color;
+}
+
+footer {
+  margin-top: 2.5em;
+}
+
+h1 {
+  font-family: $header-font;
+  line-height: 1.3em;
+  margin-top: 1em;
+  a:link, a:hover, a:active, a:visited {
+    color: inherit;
+  }
+}
+
+hr {
+  margin: 2.5em 0;
+}
+
+nav {
+  background-color: $nav-color !important;
+}
+
+p {
+  font-family: $primary-font;
+  font-size: 1.5em;
+  margin-top: 1em;
+  &#date {
+    font-size: 1.2em;
+    color: $secondary-color;
+  }
+}
+
+ul {
+  @extend p;
+}
