@@ -1,4 +1,4 @@
-var roles = ["programmer", "student", "PHP evangelist", "tech enthusiast"];
+var roles = ["programmer", "college student", "PHP evangelist", "tech enthusiast"];
 var index = 1;
 setInterval(function() {
   $("span#role").fadeOut(800, function() {
