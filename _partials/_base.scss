@@ -33,6 +33,10 @@ nav {
   background-color: $nav-color !important;
 }
 
+ol, ul {
+  @extend p;
+}
+
 p {
   font-family: $primary-font;
   font-size: 1.5em;
@@ -41,8 +45,4 @@ p {
     font-size: 1.2em;
     color: $secondary-color;
   }
-}
-
-ul {
-  @extend p;
 }
