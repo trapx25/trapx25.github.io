@@ -3,7 +3,7 @@ layout: post
 title: "Refactoring: Separating Concerns from the Controller"
 date: 2015-09-05
 categories: blog
-comments: false
+comments: true
 tags:
   - programming
   - php
