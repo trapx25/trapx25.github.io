@@ -27,28 +27,28 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-    public function index($songs = null)
-    {
-        if (Auth::check()) {
+  public function index($songs = null)
+  {
+    if (Auth::check()) {
 
-            $user = User::where('id', Auth::id())->first();
+      $user = User::where('id', Auth::id())->first();
 
-            if (!is_null($user->dropbox_token)) {
+      if (!is_null($user->dropbox_token)) {
 
-                $dropboxClient = new Client($user->dropbox_token, 'App/1.0');
-                $dropboxFiles = $dropboxClient->getDelta()['entries'];
-                $mimeTypes = ['audio/mpeg'];
+        $dropboxClient = new Client($user->dropbox_token, 'App/1.0');
+        $dropboxFiles = $dropboxClient->getDelta()['entries'];
+        $mimeTypes = ['audio/mpeg'];
 
-                foreach ($dropboxFiles as $file) {
-                    if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
-                        $songs[] = $file;
-                    }
-                }
-            }
+        foreach ($dropboxFiles as $file) {
+          if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
+            $songs[] = $file;
+          }
         }
-
-        return view('home')->with('songs', $songs);
+      }
     }
+
+    return view('home')->with('songs', $songs);
+  }
 }
 {% endhighlight %}
 
@@ -69,27 +69,27 @@ use Illuminate\Support\Facades\Auth;
 
 class DropboxRepository
 {
-    private $user;
+  private $user;
 
-    public function __construct()
-    {
-        $this->user = User::where('id', Auth::id())->first();
+  public function __construct()
+  {
+    $this->user = User::where('id', Auth::id())->first();
+  }
+
+  public function getAllSongs()
+  {
+    $dropboxClient = new Client($this->user['dropbox_token'], 'App/1.0');
+    $dropboxFiles = $dropboxClient->getDelta()['entries'];
+    $mimeTypes = ['audio/mpeg'];
+
+    foreach ($dropboxFiles as $file) {
+      if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
+        $songs[] = $file;
+      }
     }
 
-    public function getAllSongs()
-    {
-        $dropboxClient = new Client($this->user['dropbox_token'], 'App/1.0');
-        $dropboxFiles = $dropboxClient->getDelta()['entries'];
-        $mimeTypes = ['audio/mpeg'];
-
-        foreach ($dropboxFiles as $file) {
-            if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
-                $songs[] = $file;
-            }
-        }
-
-        return $songs;
-    }
+    return $songs;
+  }
 }
 {% endhighlight %}
 
@@ -101,16 +101,17 @@ use App\Dropbox\DropboxRepository;
 
 class HomeController extends Controller
 {
-    public function index($songs = null)
-    {
-       try {
-            $dropboxRepository = new DropboxRepository();
-            $songs = $dropboxRepository->getAllSongs();
-        } catch (Exception $e) {
-            // swallow exception
-        }
-        return view('home')->with('songs', $songs);
+  public function index($songs = null)
+  {
+    try {
+      $dropboxRepository = new DropboxRepository();
+      $songs = $dropboxRepository->getAllSongs();
+    } catch (Exception $e) {
+      // swallow exception
     }
+    
+    return view('home')->with('songs', $songs);
+  }
 }
 {% endhighlight %}
 
@@ -132,27 +133,27 @@ use Illuminate\Contracts\Auth\Guard as Auth;
 
 class DropboxRepository
 {
-    private $user;
+  private $user;
 
-    public function __construct(Auth $auth)
-    {
-        $this->user = $auth->user();
+  public function __construct(Auth $auth)
+  {
+    $this->user = $auth->user();
+  }
+
+  public function getAllSongs()
+  {
+    $dropboxClient = new Client($this->user['dropbox_token'], 'App/1.0');
+    $dropboxFiles = $dropboxClient->getDelta()['entries'];
+    $mimeTypes = ['audio/mpeg'];
+
+    foreach ($dropboxFiles as $file) {
+      if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
+        $songs[] = $file;
+      }
     }
 
-    public function getAllSongs()
-    {
-        $dropboxClient = new Client($this->user['dropbox_token'], 'App/1.0');
-        $dropboxFiles = $dropboxClient->getDelta()['entries'];
-        $mimeTypes = ['audio/mpeg'];
-
-        foreach ($dropboxFiles as $file) {
-            if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
-                $songs[] = $file;
-            }
-        }
-
-        return $songs;
-    }
+    return $songs;
+  }
 }
 {% endhighlight %}
 
@@ -174,22 +175,23 @@ use App\ServiceLayer\Dropbox\DropboxRepository;
 
 class HomeController extends Controller
 {
-    private $dropboxRepository;
+  private $dropboxRepository;
 
-    public function __construct(DropboxRepository $dropboxRepository)
-    {
-        $this->dropboxRepository = $dropboxRepository;
-    }
+  public function __construct(DropboxRepository $dropboxRepository)
+  {
+    $this->dropboxRepository = $dropboxRepository;
+  }
 
-    public function index($songs = null)
-    {
-        try {
-            $songs = $this->dropboxRepository->getAllSongs();
-        } catch (Exception $e) {
-            // swallow exception
-        }
-        return view('home')->with('songs', $songs);
+  public function index($songs = null)
+  {
+    try {
+      $songs = $this->dropboxRepository->getAllSongs();
+    } catch (Exception $e) {
+      // swallow exception
     }
+    
+    return view('home')->with('songs', $songs);
+  }
 }
 {% endhighlight %}
 
@@ -207,35 +209,35 @@ use Illuminate\Contracts\Auth\Guard as Auth;
 
 class DropboxRepository
 {
-    private $accessToken;
+  private $accessToken;
 
-    public function __construct(Auth $auth)
-    {
-        $this->accessToken = $auth->user()['dropbox_token'];
-    }
+  public function __construct(Auth $auth)
+  {
+    $this->accessToken = $auth->user()['dropbox_token'];
+  }
 
-    public function retrieveAllAudioFiles()
-    {
-        try {
-            $songs = $this->getAllFiles()->filter(function ($file) {
-                $mimeTypes = ['audio/mpeg'];
-                return (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes));
-            });
-            return ($songs->isEmpty()) ? null : $songs;
-        } catch (Exception $e) {
-            return null;
-        }
+  public function retrieveAllAudioFiles()
+  {
+    try {
+      $songs = $this->getAllFiles()->filter(function ($file) {
+        $mimeTypes = ['audio/mpeg'];
+        return (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes));
+      });
+      return ($songs->isEmpty()) ? null : $songs;
+    } catch (Exception $e) {
+      return null;
     }
+  }
 
-    private function getAllFiles()
-    {
-        try {
-            $dropboxClient = new Client($this->accessToken, 'App/1.0');
-            return collect($dropboxClient->getDelta()['entries']);
-        } catch (InvalidArgumentException $e) {
-            throw new Exception("User has not authenticated with Dropbox yet");
-        }
+  private function getAllFiles()
+  {
+    try {
+      $dropboxClient = new Client($this->accessToken, 'App/1.0');
+      return collect($dropboxClient->getDelta()['entries']);
+    } catch (InvalidArgumentException $e) {
+      throw new Exception("User has not authenticated with Dropbox yet");
     }
+  }
 }
 {% endhighlight %}
 
@@ -256,18 +258,18 @@ use App\ServiceLayer\Dropbox\DropboxRepository;
 
 class HomeController extends Controller
 {
-    private $dropboxRepository;
+  private $dropboxRepository;
 
-    public function __construct(DropboxRepository $dropboxRepository)
-    {
-        $this->dropboxRepository = $dropboxRepository;
-    }
+  public function __construct(DropboxRepository $dropboxRepository)
+  {
+    $this->dropboxRepository = $dropboxRepository;
+  }
 
-    public function index()
-    {
-        $songs = $this->dropboxRepository->retrieveAllAudioFiles();
-        return view('home')->with('songs', $songs);
-    }
+  public function index()
+  {
+    $songs = $this->dropboxRepository->retrieveAllAudioFiles();
+    return view('home')->with('songs', $songs);
+  }
 }
 {% endhighlight %}
 
