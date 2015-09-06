@@ -35,11 +35,11 @@ class HomeController extends Controller
 
             if (!is_null($user->dropbox_token)) {
 
-                $dbxClient = new Client($user->dropbox_token, 'App/1.0');
-                $dbxFiles = $dbxClient->getDelta()['entries'];
+                $dropboxClient = new Client($user->dropbox_token, 'App/1.0');
+                $dropboxFiles = $dropboxClient->getDelta()['entries'];
                 $mimeTypes = ['audio/mpeg'];
 
-                foreach ($dbxFiles as $file) {
+                foreach ($dropboxFiles as $file) {
                     if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
                         $songs[] = $file;
                     }
@@ -78,11 +78,11 @@ class DropboxRepository
 
     public function getAllSongs()
     {
-        $dbxClient = new Client($this->user['dropbox_token'], 'App/1.0');
-        $dbxFiles = $dbxClient->getDelta()['entries'];
+        $dropboxClient = new Client($this->user['dropbox_token'], 'App/1.0');
+        $dropboxFiles = $dropboxClient->getDelta()['entries'];
         $mimeTypes = ['audio/mpeg'];
 
-        foreach ($dbxFiles as $file) {
+        foreach ($dropboxFiles as $file) {
             if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
                 $songs[] = $file;
             }
@@ -104,8 +104,8 @@ class HomeController extends Controller
     public function index($songs = null)
     {
        try {
-            $dbxRepo = new DropboxRepository();
-            $songs = $dbxRepo->getAllSongs();
+            $dropboxRepository = new DropboxRepository();
+            $songs = $dropboxRepository->getAllSongs();
         } catch (Exception $e) {
             // swallow exception
         }
@@ -116,11 +116,11 @@ class HomeController extends Controller
 
 The predominant reason to move this logic to its own class is to keep in adherence with the Model-View-Controller architectural pattern. In this pattern, the Controller should only be responsible for acting as an intermediary between the View and the Model.
 
-When interacting with the Model, the Controller should request data from and pass data to what is known as a “Service Layer.” Essentially, a Service Layer is just middleware for the Controller and the Model. Upon receiving a request from the Controller, the Service Layer is responsible for returning domain-level data back to the Controller. The Controller then passes this information along to the View. It's important to distinguish that in this case, "domain-level data", also known as "domain logic", can be defined as any code that is specific to the application that you are building.
+When interacting with the Model, the Controller should request data from and pass data to what is known as a “Service Layer.” Essentially, a Service Layer serves as an intermediary between the Controller and the Model, often times its purpose is to separate domain-specific logic from the Model. Upon receiving a request from the Controller, the Service Layer is responsible for returning domain-level data back to the Controller. The Controller then passes this information along to the View. It's important to distinguish that in this case, "domain-level data", also known as "domain logic", can be defined as any code that is specific to the application that you are building.
 
 As you can see by my namespace, I made a Service Layer called "Dropbox" (nothing more than a folder) which contains my DropboxRepository file. Within the DropboxRepository class, we have a private property named user which reflects all of the information in the database row for the user. We will frequently be using this property throughout the class since it holds the user's Dropbox access token, which is needed to complete actions on behalf of the user.
 
-There's also a public method, getAllSongs, which retrieves all of the audio files from the user's Dropbox account. To do this, a new Dropbox client is instantiated (with the user's Dropbox access token) and all of the files are pushed to an array named dbxFiles. We then go through each file and check its mime type to see if it is an mp3 file. If it is, it gets added to a new array named songs. At the very end, we return the songs array. A try/catch block is needed in the Controller because the Dropbox client will throw an exception if the user's access token is null.
+There's also a public method, getAllSongs, which retrieves all of the audio files from the user's Dropbox account. To do this, a new Dropbox client is instantiated (with the user's Dropbox access token) and all of the files are pushed to an array named dropboxFiles. We then go through each file and check its mime type to see if it is an mp3 file. If it is, it gets added to a new array named songs. At the very end, we return the songs array. A try/catch block is needed in the Controller because the Dropbox client will throw an exception if the user's access token is null.
 
 This is a good first step, but DropboxRepository can be refactored even more:
 
@@ -141,11 +141,11 @@ class DropboxRepository
 
     public function getAllSongs()
     {
-        $dbxClient = new Client($this->user['dropbox_token'], 'App/1.0');
-        $dbxFiles = $dbxClient->getDelta()['entries'];
+        $dropboxClient = new Client($this->user['dropbox_token'], 'App/1.0');
+        $dropboxFiles = $dropboxClient->getDelta()['entries'];
         $mimeTypes = ['audio/mpeg'];
 
-        foreach ($dbxFiles as $file) {
+        foreach ($dropboxFiles as $file) {
             if (array_key_exists('mime_type', $file[1]) && in_array($file[1]['mime_type'], $mimeTypes)) {
                 $songs[] = $file;
             }
@@ -174,17 +174,17 @@ use App\ServiceLayer\Dropbox\DropboxRepository;
 
 class HomeController extends Controller
 {
-    private $dbxRepo;
+    private $dropboxRepository;
 
-    public function __construct(DropboxRepository $dbxRepo)
+    public function __construct(DropboxRepository $dropboxRepository)
     {
-        $this->dbxRepo = $dbxRepo;
+        $this->dropboxRepository = $dropboxRepository;
     }
 
     public function index($songs = null)
     {
         try {
-            $songs = $this->dbxRepo->getAllSongs();
+            $songs = $this->dropboxRepository->getAllSongs();
         } catch (Exception $e) {
             // swallow exception
         }
@@ -214,16 +214,6 @@ class DropboxRepository
         $this->accessToken = $auth->user()['dropbox_token'];
     }
 
-    private function getAllFiles()
-    {
-        try {
-            $dbxClient = new Client($this->accessToken, 'App/1.0');
-            return collect($dbxClient->getDelta()['entries']);
-        } catch (InvalidArgumentException $e) {
-            throw new Exception("User has not authenticated with Dropbox yet");
-        }
-    }
-
     public function retrieveAllAudioFiles()
     {
         try {
@@ -234,6 +224,16 @@ class DropboxRepository
             return ($songs->isEmpty()) ? null : $songs;
         } catch (Exception $e) {
             return null;
+        }
+    }
+
+    private function getAllFiles()
+    {
+        try {
+            $dropboxClient = new Client($this->accessToken, 'App/1.0');
+            return collect($dropboxClient->getDelta()['entries']);
+        } catch (InvalidArgumentException $e) {
+            throw new Exception("User has not authenticated with Dropbox yet");
         }
     }
 }
@@ -256,16 +256,16 @@ use App\ServiceLayer\Dropbox\DropboxRepository;
 
 class HomeController extends Controller
 {
-    private $dbxRepo;
+    private $dropboxRepository;
 
-    public function __construct(DropboxRepository $dbxRepo)
+    public function __construct(DropboxRepository $dropboxRepository)
     {
-        $this->dbxRepo = $dbxRepo;
+        $this->dropboxRepository = $dropboxRepository;
     }
 
     public function index()
     {
-        $songs = $this->dbxRepo->retrieveAllAudioFiles();
+        $songs = $this->dropboxRepository->retrieveAllAudioFiles();
         return view('home')->with('songs', $songs);
     }
 }
@@ -273,7 +273,7 @@ class HomeController extends Controller
 
 Remember what it used to look like? ;)
 
-I'm sure there's still *even more* that can be done &ndash; refactoring is a continuous process &ndash; but these are huge steps in the right direction.
+There's still *even more* that can be done &ndash; refactoring is a continuous process &ndash; but these are huge steps in the right direction.
 
 So, I suppose there are a couple of morals to go along with this post:
 
